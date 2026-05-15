@@ -5,7 +5,7 @@
 **skiLLM is a structured, open-source collection of reusable, self-contained Markdown modules designed to teach AI coding assistants and human developers how to perform specific software engineering tasks.**
 
 [![Skills](https://img.shields.io/badge/14_Skills-white.svg)]()
-[![Version](https://img.shields.io/badge/v1.0.0-white.svg)]()
+[![Version](https://img.shields.io/badge/v2.0.0-white.svg)]()
 [![Registry](https://img.shields.io/badge/Registry-Synchronized-success.svg)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)]()
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?style=flat-square&logo=markdown)
