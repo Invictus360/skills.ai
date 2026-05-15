@@ -8,7 +8,7 @@
 [![Version](https://img.shields.io/badge/v1.0.0-white.svg)]()
 [![Registry](https://img.shields.io/badge/Registry-Synchronized-success.svg)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)]()
-[![Markdown Standard](https://img.shields.io/badge/Markdown-black.svg)]()
+![Markdown](https://img.shields.io/badge/-Markdown-000000?style=flat-square&logo=markdown)
 [![License: MIT](https://img.shields.io/badge/MIT_License-maroon.svg)](./LICENSE)
 
 <p align="center">
