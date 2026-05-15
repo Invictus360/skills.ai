@@ -1,6 +1,6 @@
 <div align="center">
 
-<img height="125" alt="ChatGPT Image May 15, 2026, 02_52_01 PM" src="https://github.com/user-attachments/assets/b83e5c3a-d8c5-4c58-b2b7-bff31adabcaf" />
+<img height="125" alt="skills.ai" src="https://github.com/user-attachments/assets/c4da51aa-e402-40c0-8870-97a9bdeed794" />
 
 **skills.ai is a structured, open-source collection of reusable, self-contained Markdown modules designed to teach AI coding assistants and human developers how to perform specific software engineering tasks.**
 
