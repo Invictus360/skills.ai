@@ -1,88 +1,202 @@
 {
+  "version": "2.0.0",
+  "description": "Portable AI-agent execution modules with machine-readable metadata and automated validation",
   "skills": [
     {
       "name": "react-component-design",
       "category": "frontend",
       "path": "skills/frontend/react-component-design",
-      "tags": ["react", "ui", "components"]
+      "version": "2.0.0",
+      "tags": ["react", "ui", "components"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": [],
+      "triggers": ["react", "components", "hooks", "design"],
+      "estimated_context_tokens": 1800
     },
     {
       "name": "state-management-patterns",
       "category": "frontend",
       "path": "skills/frontend/state-management-patterns",
-      "tags": ["react", "state", "architecture"]
+      "version": "2.0.0",
+      "tags": ["react", "state", "architecture"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": ["react-component-design"],
+      "triggers": ["state management", "url first", "react query"],
+      "estimated_context_tokens": 1900
     },
     {
       "name": "api-design-rest",
       "category": "backend",
       "path": "skills/backend/api-design-rest",
-      "tags": ["api", "rest", "http"]
+      "version": "2.0.0",
+      "tags": ["api", "rest", "http"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": ["error-handling-architecture"],
+      "triggers": ["rest api", "http", "endpoints", "versioning"],
+      "estimated_context_tokens": 2000
     },
     {
       "name": "error-handling-architecture",
       "category": "backend",
       "path": "skills/backend/error-handling-architecture",
-      "tags": ["errors", "resilience", "backend"]
+      "version": "2.0.0",
+      "tags": ["errors", "resilience", "backend"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": true,
+      "security_level": "review-required",
+      "dependencies": [],
+      "triggers": ["error handling", "exceptions", "failure", "middleware"],
+      "estimated_context_tokens": 1950
     },
     {
       "name": "git-workflow-branching",
       "category": "dev-tools",
       "path": "skills/dev-tools/git-workflow-branching",
-      "tags": ["git", "vcs", "collaboration"]
+      "version": "2.0.0",
+      "tags": ["git", "vcs", "collaboration"],
+      "skill_type": "workflow",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": [],
+      "triggers": ["git", "branching", "commits", "pull requests"],
+      "estimated_context_tokens": 1850
     },
     {
       "name": "debugging-strategies",
       "category": "dev-tools",
       "path": "skills/dev-tools/debugging-strategies",
-      "tags": ["debugging", "troubleshooting"]
+      "version": "2.0.0",
+      "tags": ["debugging", "troubleshooting"],
+      "skill_type": "debugging",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": [],
+      "triggers": ["debugging", "troubleshooting", "reproduction", "bisect"],
+      "estimated_context_tokens": 1700
     },
     {
       "name": "accessibility-ui-design",
       "category": "ui-ux",
       "path": "skills/ui-ux/accessibility-ui-design",
-      "tags": ["a11y", "ui", "inclusive-design"]
+      "version": "2.0.0",
+      "tags": ["a11y", "ui", "inclusive-design"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": true,
+      "security_level": "safe",
+      "dependencies": [],
+      "triggers": ["accessibility", "a11y", "wcag", "keyboard", "semantic html"],
+      "estimated_context_tokens": 2050
     },
     {
       "name": "event-driven-design",
       "category": "architecture",
       "path": "skills/architecture/event-driven-design",
-      "tags": ["architecture", "events", "async"]
+      "version": "2.0.0",
+      "tags": ["architecture", "events", "async"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": [],
+      "triggers": ["events", "async", "idempotency", "message queues"],
+      "estimated_context_tokens": 2100
     },
     {
       "name": "caching-strategies",
       "category": "architecture",
       "path": "skills/architecture/caching-strategies",
-      "tags": ["performance", "caching", "scalability"]
+      "version": "2.0.0",
+      "tags": ["performance", "caching", "scalability"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": [],
+      "triggers": ["caching", "cache-aside", "ttl", "invalidation", "stampede"],
+      "estimated_context_tokens": 1950
     },
     {
       "name": "code-review-guidelines",
       "category": "code-quality",
       "path": "skills/code-quality/code-review-guidelines",
-      "tags": ["review", "quality", "team"]
+      "version": "2.0.0",
+      "tags": ["review", "quality", "team"],
+      "skill_type": "review",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "safe",
+      "dependencies": [],
+      "triggers": ["code review", "pr review", "pull request", "merge request"],
+      "estimated_context_tokens": 1600
     },
     {
       "name": "dom-security-hardening",
       "category": "frontend",
       "path": "skills/frontend/dom-security-hardening",
-      "tags": ["security", "csp"]
+      "version": "2.0.0",
+      "tags": ["security", "csp"],
+      "skill_type": "security",
+      "dangerous": true,
+      "requires_review": true,
+      "security_level": "dangerous",
+      "dependencies": [],
+      "triggers": ["xss", "csp", "security", "dom", "sanitization"],
+      "estimated_context_tokens": 2150
     },
     {
       "name": "database-query-optimization",
       "category": "backend",
       "path": "skills/backend/database-query-optimization",
-      "tags": ["backend", "database", "performance", "sql"]
+      "version": "2.0.0",
+      "tags": ["backend", "database", "performance", "sql"],
+      "skill_type": "workflow",
+      "dangerous": true,
+      "requires_review": true,
+      "security_level": "review-required",
+      "dependencies": [],
+      "triggers": ["database", "sql", "performance", "n+1", "optimization"],
+      "estimated_context_tokens": 2250
     },
     {
       "name": "logging-observability-standards",
       "category": "architecture",
       "path": "skills/architecture/logging-observability-standards",
-      "tags": ["architecture", "observability", "logging", "backend"]
+      "version": "2.0.0",
+      "tags": ["architecture", "observability", "logging", "backend"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": false,
+      "security_level": "review-required",
+      "dependencies": ["error-handling-architecture"],
+      "triggers": ["logging", "observability", "debugging", "monitoring", "tracing"],
+      "estimated_context_tokens": 2000
     },
     {
       "name": "ci-cd-pipeline-architecture",
       "category": "dev-tools",
       "path": "skills/dev-tools/ci-cd-pipeline-architecture",
-      "tags": ["dev-tools", "ci-cd", "automation", "devops"]
+      "version": "2.0.0",
+      "tags": ["dev-tools", "ci-cd", "automation", "devops"],
+      "skill_type": "architecture",
+      "dangerous": false,
+      "requires_review": true,
+      "security_level": "review-required",
+      "dependencies": ["git-workflow-branching"],
+      "triggers": ["ci-cd", "pipeline", "automation", "deployment"],
+      "estimated_context_tokens": 2200
     }
   ]
 }
