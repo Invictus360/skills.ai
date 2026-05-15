@@ -1,8 +1,8 @@
 <div align="center">
 
-<img height="125" alt="Group 6 (1)" src="https://github.com/user-attachments/assets/f5ce7dd3-1433-44b2-8305-c4c4ec6f2fb8" />
+<img height="200" alt="skiLLM" src="https://github.com/user-attachments/assets/7c8a50b9-9923-4f19-8e95-e82a89ee9a2c" />
 
-**skills.ai is a structured, open-source collection of reusable, self-contained Markdown modules designed to teach AI coding assistants and human developers how to perform specific software engineering tasks.**
+**skiLLM is a structured, open-source collection of reusable, self-contained Markdown modules designed to teach AI coding assistants and human developers how to perform specific software engineering tasks.**
 
 [![Skills](https://img.shields.io/badge/14_Skills-white.svg)]()
 [![Version](https://img.shields.io/badge/v1.0.0-white.svg)]()
@@ -25,7 +25,7 @@ When working with modern AI coding assistants (like Cursor, GitHub Copilot, or C
 
 Massive, monolithic "system prompts" or `.cursorrules` files quickly become unmanageable, leading to token bloat and diluted AI focus. 
 
-**The skills.ai solves this by introducing modularity.**
+**The skiLLM solves this by introducing modularity.**
 Instead of telling the AI *everything* about your codebase at once, you dynamically inject hyper-specific, technology-agnostic checklists (`SKILL.md`) exactly when the AI needs them. 
 
 - **No generic advice** ("Write clean code").
