@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Read the Contributing Guidelines
+    url: https://github.com/Invictus360/skills.ai/blob/main/CONTRIBUTING.md
+    about: Please review the strict rules for adding new skills before proposing one.
+  - name: 🔍 View the Skill Schema
+    url: https://github.com/Invictus360/skills.ai/blob/main/schema/SKILL_SCHEMA.md
+    about: Familiarize yourself with the required markdown structure.
