@@ -4,20 +4,12 @@
 
 **skills.ai is a structured, open-source collection of reusable, self-contained Markdown modules designed to teach AI coding assistants and human developers how to perform specific software engineering tasks.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)]()
-[![Markdown Standard](https://img.shields.io/badge/Markdown-Strict-black.svg)]()
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
-<br />
-[![Total Skills](https://img.shields.io/badge/Total_Skills-14-orange.svg)]()
-[![Schema](https://img.shields.io/badge/Schema-Valid-blueviolet.svg)]()
+[![Skills](https://img.shields.io/badge/14_Skills-white.svg)]()
+[![Version](https://img.shields.io/badge/v1.0.0-white.svg)]()
 [![Registry](https://img.shields.io/badge/Registry-Synchronized-success.svg)]()
-[![Standard](https://img.shields.io/badge/Standard-SOP--Ready-yellow.svg)]()
-<br />
-[![Frontend](https://img.shields.io/badge/Category-Frontend-ff69b4.svg)]()
-[![Backend](https://img.shields.io/badge/Category-Backend-6b4fbb.svg)]()
-[![Architecture](https://img.shields.io/badge/Category-Architecture-007acc.svg)]()
-[![DevTools](https://img.shields.io/badge/Category-DevTools-2ea44f.svg)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)]()
+[![Markdown Standard](https://img.shields.io/badge/Markdown-black.svg)]()
+[![License: MIT](https://img.shields.io/badge/MIT_License-maroon.svg)](./LICENSE)
 
 <p align="center">
   <a href="#how-to-use-the-library">Usage Guide</a> •
