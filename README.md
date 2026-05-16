@@ -2,7 +2,7 @@
 
 ![Project Demo](assets/logo.gif)
 
-**skiLLM is a structured, open-source collection of reusable, self-contained Markdown modules designed to teach AI coding assistants and human developers how to perform specific software engineering tasks.**
+**skiLL.Md is a structured, open-source collection of reusable, self-contained Markdown modules designed to teach AI coding assistants and human developers how to perform specific software engineering tasks.**
 
 [![Skills](https://img.shields.io/badge/14_Skills-white.svg)]()
 [![Version](https://img.shields.io/badge/v2.0.0-white.svg)]()
@@ -25,7 +25,7 @@ When working with modern AI coding assistants (like Cursor, GitHub Copilot, or C
 
 Massive, monolithic "system prompts" or `.cursorrules` files quickly become unmanageable, leading to token bloat and diluted AI focus. 
 
-**The skiLLM solves this by introducing modularity.**
+**The skiLL.Md solves this by introducing modularity.**
 Instead of telling the AI *everything* about your codebase at once, you dynamically inject hyper-specific, technology-agnostic checklists (`SKILL.md`) exactly when the AI needs them. 
 
 - **No generic advice** ("Write clean code").
