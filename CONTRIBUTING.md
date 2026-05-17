@@ -1,5 +1,7 @@
 <img height="648" alt="contri guide" src="https://github.com/user-attachments/assets/aced5641-2cc2-437d-82a7-193cf9b4916e" />
 
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=400&&center=true&size=18&pause=1000&color=0D1117&width=700&lines=why+r+u+visiting+this+page+in+light+mode?+>:(" />
+
 To maintain the high quality and uniformity of this skills library, all contributions must adhere to the following strict rules:
 
 1. **One Skill = One Folder**: Every skill must live in its own directory under the appropriate category inside `skills/`.
