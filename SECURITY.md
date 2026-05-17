@@ -1,5 +1,7 @@
 <img height="648" alt="sec guide" src="https://github.com/user-attachments/assets/406433bf-4466-40c6-8ca4-03c709195ce0" />
 
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=400&&center=true&size=18&pause=1000&color=0D1117&width=700&lines=again+why?+do+u+enjoy+this?" />
+
 skiLL.Md accepts only safe, transparent, auditable, and non-malicious skills.
 
 Any contribution that enables abuse, malware behavior, credential theft, evasion, surveillance, destructive automation, or unsafe system access will be rejected and may result in a permanent ban from contributing.
