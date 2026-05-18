@@ -1,42 +1,38 @@
 name: Validate Skills
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, edited]
-    paths:
-      - "skills/**"
-      - ".github/pull_request_template.md"
+on:  
+  pull_request:    
+    types: [opened, synchronize, reopened, edited]    
+    paths:      
+      - "skills/**"      
+      - ".github/pull_request_template.md"      
       - "scripts/**"
 
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-
-    permissions:
-      pull-requests: read
-      contents: read
-
-    steps:
-      - name: Checkout
+jobs:  
+  validate:    
+    runs-on: ubuntu-latest    
+    permissions:      
+      pull-requests: read      
+      contents: read    
+    steps:      
+      - name: Checkout        
         uses: actions/checkout@v4
         with:
-          # Force GitHub to use the exact code you just committed and pushed
+          # Force the runner to pull your exact PR branch commit instead of the virtual merge
           ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Dependencies
-        run: |
-          pip install pyyaml python-frontmatter requests scikit-learn
-
-      - name: Run Validation
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          REPO_NAME: ${{ github.repository }}
-        run: |
-          cat scripts/validate_skills.py
+          
+      - name: Setup Python        
+        uses: actions/setup-python@v5        
+        with:          
+          python-version: "3.12"      
+          
+      - name: Install Dependencies        
+        run: |          
+          pip install pyyaml python-frontmatter requests scikit-learn      
+          
+      - name: Run Validation        
+        env:          
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
+          PR_NUMBER: ${{ github.event.pull_request.number }}          
+          REPO_NAME: ${{ github.repository }}        
+        run: |          
           python scripts/validate_skills.py
