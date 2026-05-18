@@ -91,7 +91,7 @@ API_KEY_PATTERNS = [
     r"AIza[0-9A-Za-z\\-_]{35}",
     r"sk-[A-Za-z0-9]{20,}",
     r"AKIA[0-9A-Z]{16}",
-    r"-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----",
+    r"-----BEGIN (?:RSA|DSA|EC|OPENSSH) PRIVATE KEY-----",
     r"xox[baprs]-[A-Za-z0-9-]+",
 ]
 
@@ -111,11 +111,11 @@ SUSPICIOUS_PATTERNS = [
 OBFUSCATION_PATTERNS = [
     r"[A-Za-z0-9+/]{200,}={0,2}",
     r"fromcharcode",
-    r"atob\(",
-    r"btoa\(",
+    r"atob\s*[(]",
+    r"btoa\s*[(]",
     r"marshal\.loads",
     r"zlib\.decompress",
-    r"exec\(base64",
+    r"exec\s*[(]base64",
 ]
 
 REQUIRED_PR_CHECKBOXES = [
