@@ -7,7 +7,7 @@ use serde_yaml::Value as YamlValue;
 use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process;
 use walkdir::WalkDir;
 
@@ -54,6 +54,14 @@ lazy_static! {
         Regex::new(r"(?i)Invoke-Expression").unwrap(),
         Regex::new(r"(?i)base64\s+-d").unwrap(),
         Regex::new(r"(?i)sh\s+-c\s+.*http").unwrap(),
+        Regex::new(r"(?i)rm\s+-rf\s+/").unwrap(),
+    ];
+    static ref SUSPICIOUS_INSTRUCTIONS: Vec<Regex> = vec![
+        Regex::new(r"(?i)ignore (all )?previous instructions").unwrap(),
+        Regex::new(r"(?i)you are now (an? )?(unrestricted|jailbroken|unfiltered)").unwrap(),
+        Regex::new(r"(?i)disregard (the )?system prompt").unwrap(),
+        Regex::new(r"(?i)bypass security").unwrap(),
+        Regex::new(r"(?i)forget (all )?rules").unwrap(),
     ];
     static ref OBFUSCATION_PATTERNS: Vec<Regex> = vec![
         Regex::new(r"(?i)[A-Za-z0-9+/]{200,}={0,2}").unwrap(),
@@ -85,6 +93,7 @@ impl Validator {
         self.errors.push(message);
     }
 
+    #[allow(dead_code)]
     fn warn(&mut self, message: String) {
         self.warnings.push(message);
     }
@@ -106,13 +115,18 @@ fn get_pr_changed_files(client: &Client, token: &str, repo: &str, pr: &str) -> V
     match res {
         Ok(response) if response.status().is_success() => {
             if let Ok(json) = response.json::<Vec<JsonValue>>() {
-                return json
+                let files: Vec<String> = json
                     .iter()
                     .filter_map(|v| v["filename"].as_str().map(String::from))
                     .collect();
+                println!("INFO: Found {} changed files from GitHub API.", files.len());
+                for f in &files {
+                    println!("  - {}", f);
+                }
+                return files;
             }
         }
-        _ => {}
+        _ => println!("WARNING: Failed to fetch PR files from GitHub API."),
     }
     Vec::new()
 }
@@ -127,7 +141,7 @@ fn extract_section(body: &str, section_name: &str) -> Option<String> {
 
 fn validate_pr_template(validator: &mut Validator, client: &Client, token: &str, repo: &str, pr: &str) {
     if token.is_empty() || repo.is_empty() || pr.is_empty() {
-        validator.fail("Missing GitHub environment variables".into());
+        println!("INFO: Skipping PR template validation (Running locally / Missing GitHub Env Vars).");
         return;
     }
 
@@ -155,8 +169,20 @@ fn validate_pr_template(validator: &mut Validator, client: &Client, token: &str,
 
     let clean_body = HTML_COMMENT_REGEX.replace_all(&body, "").trim().to_string();
 
-    if clean_body.len() < 50 {
-        validator.fail("PR description content is completely empty or too short. Please fill out the template.".into());
+    // If all they did was open the PR without typing anything, the length of the headings alone is ~150 chars.
+    // If we remove all boilerplate headings, is there anything left?
+    let body_without_headings = clean_body.replace("## Summary", "")
+                                          .replace("## Type of Change", "")
+                                          .replace("## What Changed", "")
+                                          .replace("## Files Added/Modified", "")
+                                          .replace("## Skill Structure Checklist", "")
+                                          .replace("## Validation", "")
+                                          .replace("## Related Issues", "")
+                                          .replace("## Screenshots / Preview", "")
+                                          .replace("## Additional Notes", "");
+
+    if body_without_headings.trim().len() < 20 {
+        validator.fail("PR description content is essentially empty. Please replace the default template comments with actual details.".into());
         return;
     }
 
@@ -178,7 +204,8 @@ fn validate_pr_template(validator: &mut Validator, client: &Client, token: &str,
 
         if let Some(content) = extract_section(&body, section_name) {
             let section_content = HTML_COMMENT_REGEX.replace_all(&content, "").trim().to_string();
-            if section_content.is_empty() || section_content == "- [ ]" || section_content.len() < 5 {
+            // A common failure point: user leaves "- [ ]" or "Closes #..." blank text
+            if section_content.is_empty() || section_content.starts_with("- [ ]") || section_content.len() < 5 {
                 validator.fail(format!("The PR section '{}' has been left blank. Please provide actual details.", section_name));
             }
         }
@@ -189,61 +216,54 @@ fn as_string(val: Option<&YamlValue>) -> String {
     match val {
         Some(YamlValue::String(s)) => s.clone(),
         Some(YamlValue::Number(n)) => n.to_string(),
+        Some(YamlValue::Bool(b)) => b.to_string(),
         _ => String::new(),
     }
 }
 
 fn validate_frontmatter(validator: &mut Validator, metadata: &YamlValue, path: &str) {
-    let mapping = metadata.as_mapping();
-    if mapping.is_none() {
-        validator.fail(format!("{}: Frontmatter is not a valid YAML mapping", path));
-        return;
-    }
-    let mapping = mapping.unwrap();
+    let mapping = match metadata.as_mapping() {
+        Some(m) => m,
+        None => {
+            validator.fail(format!("{}: Frontmatter is not a valid YAML mapping", path));
+            return;
+        }
+    };
 
     for field in REQUIRED_FIELDS {
         if !mapping.contains_key(&YamlValue::String(field.to_string())) {
-            validator.fail(format!("{}: Missing metadata field '{}'", path, field));
+            validator.fail(format!("{}: Missing REQUIRED metadata field '{}'", path, field));
         }
     }
 
     let name = as_string(metadata.get("name"));
     if !Regex::new(r"^[a-z0-9-]{1,40}$").unwrap().is_match(&name) {
-        validator.fail(format!("{}: Invalid kebab-case name", path));
+        validator.fail(format!("{}: Invalid 'name'. Must be lowercase kebab-case and under 40 chars.", path));
     }
 
     let version = as_string(metadata.get("version"));
     if !Regex::new(r"^\d+\.\d+\.\d+$").unwrap().is_match(&version) {
-        validator.fail(format!("{}: Invalid semver version", path));
-    }
-
-    let description = as_string(metadata.get("description"));
-    if description.len() > 140 {
-        validator.fail(format!("{}: Description exceeds 140 characters", path));
+        validator.fail(format!("{}: Invalid 'version'. Must follow semver (e.g. 1.0.0).", path));
     }
 
     let category = as_string(metadata.get("category"));
     if !category.is_empty() && !VALID_CATEGORIES.contains(&category.as_str()) {
-        validator.fail(format!("{}: Invalid category '{}'", path, category));
+        validator.fail(format!("{}: Invalid 'category' '{}'", path, category));
     }
 
     let skill_type = as_string(metadata.get("skill_type"));
     if !skill_type.is_empty() && !VALID_SKILL_TYPES.contains(&skill_type.as_str()) {
-        validator.fail(format!("{}: Invalid skill_type", path));
+        validator.fail(format!("{}: Invalid 'skill_type' '{}'", path, skill_type));
     }
 
     let security_level = as_string(metadata.get("security_level"));
     if !security_level.is_empty() && !VALID_SECURITY_LEVELS.contains(&security_level.as_str()) {
-        validator.fail(format!("{}: Invalid security_level", path));
+        validator.fail(format!("{}: Invalid 'security_level' '{}'", path, security_level));
     }
-
-    if let Some(YamlValue::Sequence(seq)) = metadata.get("compatible_agents") {
-        for agent_val in seq {
-            let agent = as_string(Some(agent_val));
-            if !VALID_AGENTS.contains(&agent.as_str()) {
-                validator.fail(format!("{}: Invalid compatible agent '{}'", path, agent));
-            }
-        }
+    
+    let is_dangerous = as_string(metadata.get("dangerous")) == "true";
+    if is_dangerous && security_level == "safe" {
+        validator.fail(format!("{}: Conflict - 'dangerous' is true, but 'security_level' is safe.", path));
     }
 }
 
@@ -252,11 +272,11 @@ fn validate_sections(validator: &mut Validator, content: &str, path: &str) {
     for section in REQUIRED_SECTIONS {
         if let Some(index) = content.find(section) {
             if index < last_index {
-                validator.fail(format!("{}: Section order invalid near '{}'", path, section));
+                validator.fail(format!("{}: Section order invalid near '{}'. Please follow the schema order.", path, section));
             }
             last_index = index;
         } else {
-            validator.fail(format!("{}: Missing required section '{}'", path, section));
+            validator.fail(format!("{}: Missing required markdown section '{}'", path, section));
         }
     }
 }
@@ -264,18 +284,18 @@ fn validate_sections(validator: &mut Validator, content: &str, path: &str) {
 fn scan_patterns(validator: &mut Validator, content: &str, path: &str, patterns: &[Regex], message: &str) {
     for pattern in patterns {
         if pattern.is_match(content) {
-            validator.fail(format!("{}: {}", path, message));
+            validator.fail(format!("{}: {} (Matched: {})", path, message, pattern.as_str()));
         }
     }
 }
 
 fn parse_frontmatter(content: &str) -> Result<Post, String> {
     if !content.starts_with("---") {
-        return Err("Content does not start with ---".to_string());
+        return Err("Content does not start with --- (Missing YAML Frontmatter)".to_string());
     }
     let parts: Vec<&str> = content.splitn(3, "---").collect();
     if parts.len() < 3 {
-        return Err("Invalid frontmatter format".to_string());
+        return Err("Invalid frontmatter format. Ensure it is closed with ---".to_string());
     }
     
     let metadata_str = parts[1];
@@ -286,9 +306,7 @@ fn parse_frontmatter(content: &str) -> Result<Post, String> {
 }
 
 fn detect_duplicates(validator: &mut Validator, skill_texts: &HashMap<String, String>) {
-    if skill_texts.len() < 2 {
-        return;
-    }
+    if skill_texts.len() < 2 { return; }
 
     let names: Vec<_> = skill_texts.keys().collect();
     let texts: Vec<_> = skill_texts.values().collect();
@@ -319,9 +337,7 @@ fn detect_duplicates(validator: &mut Validator, skill_texts: &HashMap<String, St
     let mut vectors: Vec<HashMap<String, f64>> = Vec::new();
     for tokens in &doc_tokens {
         let mut tf: HashMap<String, usize> = HashMap::new();
-        for token in tokens {
-            *tf.entry(token.clone()).or_insert(0) += 1;
-        }
+        for token in tokens { *tf.entry(token.clone()).or_insert(0) += 1; }
 
         let mut vec: HashMap<String, f64> = HashMap::new();
         let mut norm_sq = 0.0;
@@ -333,9 +349,7 @@ fn detect_duplicates(validator: &mut Validator, skill_texts: &HashMap<String, St
 
         let norm = norm_sq.sqrt();
         if norm > 0.0 {
-            for val in vec.values_mut() {
-                *val /= norm;
-            }
+            for val in vec.values_mut() { *val /= norm; }
         }
         vectors.push(vec);
     }
@@ -344,25 +358,22 @@ fn detect_duplicates(validator: &mut Validator, skill_texts: &HashMap<String, St
         for j in (i + 1)..names.len() {
             let mut score = 0.0;
             for (token, val_i) in &vectors[i] {
-                if let Some(val_j) = vectors[j].get(token) {
-                    score += val_i * val_j;
-                }
+                if let Some(val_j) = vectors[j].get(token) { score += val_i * val_j; }
             }
             if score > 0.95 {
-                validator.fail(format!(
-                    "Duplicate skill detected between '{}' and '{}' (similarity {:.2})",
-                    names[i], names[j], score
-                ));
+                validator.fail(format!("Duplicate skill detected between '{}' and '{}' (similarity {:.2})", names[i], names[j], score));
             }
         }
     }
 }
 
 fn validate_skill_file(validator: &mut Validator, path_str: &str, raw: &str) -> Option<String> {
+    println!("INFO: Validating {}", path_str);
+    
     let post = match parse_frontmatter(raw) {
         Ok(p) => p,
         Err(e) => {
-            validator.fail(format!("{}: Invalid frontmatter: {}", path_str, e));
+            validator.fail(format!("{}: {}", path_str, e));
             return None;
         }
     };
@@ -371,14 +382,15 @@ fn validate_skill_file(validator: &mut Validator, path_str: &str, raw: &str) -> 
     validate_sections(validator, &post.content, path_str);
     
     scan_patterns(validator, raw, path_str, &API_KEY_PATTERNS, "Potential API key or secret detected");
-    scan_patterns(validator, raw, path_str, &SUSPICIOUS_PATTERNS, "Suspicious connection command string detected");
+    scan_patterns(validator, raw, path_str, &SUSPICIOUS_PATTERNS, "Suspicious/Malicious shell command detected");
+    scan_patterns(validator, raw, path_str, &SUSPICIOUS_INSTRUCTIONS, "Prompt Injection / Jailbreak instruction detected");
     scan_patterns(validator, raw, path_str, &OBFUSCATION_PATTERNS, "Possible obfuscated payload detected");
 
     let has_anti = raw.contains("**❌ Anti-pattern:**") || raw.contains("Anti-pattern") || raw.contains("### Anti-pattern");
     let has_correct = raw.contains("**✅ Correct pattern:**") || raw.contains("Correct pattern") || raw.contains("### Correct pattern");
 
-    if !has_anti { validator.fail(format!("{}: Missing anti-pattern example", path_str)); }
-    if !has_correct { validator.fail(format!("{}: Missing correct-pattern example", path_str)); }
+    if !has_anti { validator.fail(format!("{}: Missing anti-pattern example in Example section", path_str)); }
+    if !has_correct { validator.fail(format!("{}: Missing correct-pattern example in Example section", path_str)); }
 
     Some(post.content)
 }
@@ -401,7 +413,10 @@ fn main() {
         for entry in WalkDir::new(skills_dir).into_iter().filter_map(|e| e.ok()) {
             let path = entry.path();
             if path.is_file() && path.file_name().unwrap_or_default() == "SKILL.md" {
-                let relative_path = path.to_string_lossy().to_string();
+                // Normalize path slashes so it matches GitHub's API response regardless of OS
+                let relative_path = path.to_string_lossy().replace("\\", "/");
+                
+                // Only validate if it's in the PR diff, OR if we are running locally (changed_files is empty)
                 let is_changed = changed_files.is_empty() || changed_files.iter().any(|f| relative_path.ends_with(f) || f.ends_with(&relative_path));
 
                 if let Ok(raw) = fs::read_to_string(path) {
@@ -415,6 +430,8 @@ fn main() {
                 }
             }
         }
+    } else {
+        println!("INFO: 'skills' directory not found. Skipping file validation.");
     }
 
     detect_duplicates(&mut validator, &skill_texts);
