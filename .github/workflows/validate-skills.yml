@@ -20,19 +20,19 @@ jobs:
           # Force the runner to pull your exact PR branch commit instead of the virtual merge
           ref: ${{ github.event.pull_request.head.sha }}
           
-      - name: Setup Python        
-        uses: actions/setup-python@v5        
-        with:          
-          python-version: "3.12"      
+      - name: Setup Rust        
+        uses: dtolnay/rust-toolchain@stable
           
-      - name: Install Dependencies        
-        run: |          
-          pip install pyyaml python-frontmatter requests scikit-learn      
+      - name: Cache Rust Dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "scripts/validate_skills -> target"
           
       - name: Run Validation        
         env:          
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
           PR_NUMBER: ${{ github.event.pull_request.number }}          
           REPO_NAME: ${{ github.repository }}        
+        working-directory: scripts/validate_skills
         run: |          
-          python scripts/validate_skills.py
+          cargo run --release
